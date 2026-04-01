@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🪙 Crypto Portfolio Tracker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      color: #e0e0e0;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #f7971e, #ffd200);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: #9a9ab5;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.8rem;
+      color: #9a9ab5;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 6px 14px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      flex-shrink: 0;
+    }
+
+    .status-dot.loading {
+      background: #ffd200;
+      animation: pulse 1s infinite;
+    }
+
+    .status-dot.error {
+      background: #f87171;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .refresh-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 210, 0, 0.12);
+      border: 1px solid rgba(255, 210, 0, 0.35);
+      color: #ffd200;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .refresh-btn:hover {
+      background: rgba(255, 210, 0, 0.22);
+    }
+
+    .refresh-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .refresh-icon {
+      display: inline-block;
+      transition: transform 0.5s ease;
+    }
+
+    .refresh-icon.spinning {
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .table-wrapper {
+      width: 100%;
+      max-width: 960px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: linear-gradient(90deg, #f7971e33, #ffd20033);
+    }
+
+    thead th {
+      padding: 18px 22px;
+      text-align: left;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #ffd200;
+      border-bottom: 1px solid rgba(255, 210, 0, 0.2);
+    }
+
+    tbody tr {
+      transition: background 0.2s ease;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    tbody td {
+      padding: 16px 22px;
+      font-size: 0.95rem;
+      color: #dde2f0;
+    }
+
+    .crypto-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #ffffff;
+    }
+
+    .crypto-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .icon-eth  { background: linear-gradient(135deg, #627eea, #3c4fcf); }
+    .icon-wrp  { background: linear-gradient(135deg, #a855f7, #7e22ce); }
+    .icon-pep  { background: linear-gradient(135deg, #4ade80, #16a34a); }
+    .icon-btc  { background: linear-gradient(135deg, #f7971e, #f59e0b); }
+
+    .wallet-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .wallet-mmsk {
+      background: rgba(99, 179, 237, 0.15);
+      color: #63b3ed;
+      border: 1px solid rgba(99, 179, 237, 0.3);
+    }
+
+    .wallet-blw {
+      background: rgba(252, 129, 74, 0.15);
+      color: #fc814a;
+      border: 1px solid rgba(252, 129, 74, 0.3);
+    }
+
+    .quantity {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: #c4c9e2;
+    }
+
+    .price {
+      font-family: 'Courier New', monospace;
+      color: #a8b2d8;
+      transition: color 0.4s;
+    }
+
+    .price.flash-up   { color: #4ade80; }
+    .price.flash-down { color: #f87171; }
+
+    .total {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #ffd200;
+      transition: color 0.4s;
+    }
+
+    .total.flash-up   { color: #4ade80; }
+    .total.flash-down { color: #f87171; }
+
+    .skeleton {
+      display: inline-block;
+      width: 90px;
+      height: 14px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .summary-bar {
+      width: 100%;
+      max-width: 960px;
+      margin-top: 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 20px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .summary-bar span {
+      font-size: 0.9rem;
+      color: #9a9ab5;
+    }
+
+    .summary-bar strong {
+      font-size: 1.25rem;
+      color: #ffd200;
+      margin-left: 10px;
+    }
+
+    .error-banner {
+      display: none;
+      width: 100%;
+      max-width: 960px;
+      margin-bottom: 16px;
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 0.85rem;
+      color: #f87171;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.78rem;
+      color: #55556a;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🪙 Crypto Portfolio Tracker</h1>
+    <p>📊 Live prices via CoinGecko &bull; auto-refreshes every 60s</p>
+  </header>
+
+  <div class="controls">
+    <div class="status-pill">
+      <div class="status-dot loading" id="statusDot"></div>
+      <span id="statusText">Fetching prices…</span>
+    </div>
+    <button class="refresh-btn" id="refreshBtn" onclick="fetchPrices()">
+      <span class="refresh-icon" id="refreshIcon">🔄</span> Refresh
+    </button>
+  </div>
+
+  <div class="error-banner" id="errorBanner"></div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>💎 Crypto</th>
+          <th>👛 Wallet</th>
+          <th>🔢 Quantity</th>
+          <th>💵 Price / Unit</th>
+          <th>💰 Total Value</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- Rows rendered by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary-bar">
+    <span>🧾 Total holdings across all wallets</span>
+    <div>
+      <span>Portfolio Value:</span>
+      <strong id="portfolioTotal"><span class="skeleton"></span></strong>
+    </div>
+  </div>
+
+  <footer>⚡ Crypto Portfolio Tracker &mdash; Prices from <a href="https://www.coingecko.com" target="_blank" rel="noopener" style="color:#ffd200;text-decoration:none;">CoinGecko</a></footer>
+
+  <script>
+    // ─── Holdings config ────────────────────────────────────────────────────────
+    // coingeckoId: the CoinGecko coin id used for price lookups
+    // weth uses ethereum pricing since it's 1:1 pegged
+    const HOLDINGS = [
+      {
+        label:       'WRP ETH',
+        iconClass:   'icon-wrp',
+        iconEmoji:   '🌀',
+        wallet:      'MMSK',
+        walletClass: 'wallet-mmsk',
+        walletEmoji: '💼',
+        quantity:    0.00389,
+        coingeckoId: 'ethereum',
+        rowId:       'row-wrpeth',
+      },
+      {
+        label:       'ETH',
+        iconClass:   'icon-eth',
+        iconEmoji:   '⟠',
+        wallet:      'MMSK',
+        walletClass: 'wallet-mmsk',
+        walletEmoji: '💼',
+        quantity:    0.00164,
+        coingeckoId: 'ethereum',
+        rowId:       'row-eth',
+      },
+      {
+        label:       'PEP',
+        iconClass:   'icon-pep',
+        iconEmoji:   '🐸',
+        wallet:      'MMSK',
+        walletClass: 'wallet-mmsk',
+        walletEmoji: '💼',
+        quantity:    1000158.32,
+        coingeckoId: 'pepe',
+        rowId:       'row-pep',
+      },
+      {
+        label:       'BTC',
+        iconClass:   'icon-btc',
+        iconEmoji:   '₿',
+        wallet:      'BLW',
+        walletClass: 'wallet-blw',
+        walletEmoji: '🔥',
+        quantity:    0.0075,
+        coingeckoId: 'bitcoin',
+        rowId:       'row-btc',
+      },
+    ];
+
+    // Tracks previous prices to show up/down flash
+    const prevPrices = {};
+
+    // ─── Build skeleton rows on first load ──────────────────────────────────────
+    function buildRows() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = HOLDINGS.map(h => `
+        <tr id="${h.rowId}">
+          <td>
+            <div class="crypto-name">
+              <div class="crypto-icon ${h.iconClass}">${h.iconEmoji}</div>
+              ${h.label}
+            </div>
+          </td>
+          <td><span class="wallet-badge ${h.walletClass}">${h.walletEmoji} ${h.wallet}</span></td>
+          <td class="quantity">${formatQty(h.quantity)}</td>
+          <td class="price" id="${h.rowId}-price"><span class="skeleton"></span></td>
+          <td class="total" id="${h.rowId}-total"><span class="skeleton"></span></td>
+        </tr>
+      `).join('');
+    }
+
+    // ─── Number helpers ──────────────────────────────────────────────────────────
+    function formatQty(n) {
+      // Show enough decimals for both tiny and large quantities
+      if (n >= 1000) return n.toLocaleString('de-DE', { maximumFractionDigits: 2 });
+      return n.toLocaleString('de-DE', { maximumSignificantDigits: 6 });
+    }
+
+    function formatPrice(n) {
+      if (n < 0.0001)  return n.toLocaleString('de-DE', { maximumSignificantDigits: 4 });
+      if (n < 1)       return n.toLocaleString('de-DE', { minimumFractionDigits: 6, maximumFractionDigits: 8 });
+      if (n < 10)      return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+      return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatTotal(n) {
+      return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // ─── Flash animation helper ──────────────────────────────────────────────────
+    function flash(el, direction) {
+      el.classList.remove('flash-up', 'flash-down');
+      void el.offsetWidth; // reflow to restart animation
+      el.classList.add(direction === 'up' ? 'flash-up' : 'flash-down');
+      setTimeout(() => el.classList.remove('flash-up', 'flash-down'), 1500);
+    }
+
+    // ─── Main fetch ──────────────────────────────────────────────────────────────
+    async function fetchPrices() {
+      setLoading(true);
+
+      const ids = [...new Set(HOLDINGS.map(h => h.coingeckoId))].join(',');
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur`;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        updateTable(data);
+        setStatus('ok');
+        hideError();
+      } catch (err) {
+        setStatus('error');
+        showError(`⚠️ Could not fetch prices: ${err.message}. Showing last known values.`);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function updateTable(data) {
+      let portfolioTotal = 0;
+
+      HOLDINGS.forEach(h => {
+        const coinData = data[h.coingeckoId];
+        if (!coinData) return;
+
+        const price = coinData.eur;
+        const total = price * h.quantity;
+        portfolioTotal += total;
+
+        const priceEl = document.getElementById(`${h.rowId}-price`);
+        const totalEl = document.getElementById(`${h.rowId}-total`);
+
+        const prev = prevPrices[h.rowId];
+        if (prev !== undefined && price !== prev) {
+          flash(priceEl, price > prev ? 'up' : 'down');
+          flash(totalEl, price > prev ? 'up' : 'down');
+        }
+        prevPrices[h.rowId] = price;
+
+        priceEl.textContent = `${formatPrice(price)} €`;
+        totalEl.textContent = `${formatTotal(total)} €`;
+      });
+
+      document.getElementById('portfolioTotal').textContent = `${formatTotal(portfolioTotal)} €`;
+    }
+
+    // ─── UI state helpers ────────────────────────────────────────────────────────
+    function setLoading(isLoading) {
+      const btn  = document.getElementById('refreshBtn');
+      const icon = document.getElementById('refreshIcon');
+      btn.disabled = isLoading;
+      icon.classList.toggle('spinning', isLoading);
+    }
+
+    function setStatus(state) {
+      const dot  = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      const now  = new Date().toLocaleTimeString('en-GB');
+
+      dot.className = 'status-dot';
+      if (state === 'ok') {
+        dot.classList.add('');   // green by default
+        text.textContent = `Last updated ${now}`;
+      } else if (state === 'error') {
+        dot.classList.add('error');
+        text.textContent = `Update failed at ${now}`;
+      } else {
+        dot.classList.add('loading');
+        text.textContent = 'Fetching prices…';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorBanner');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function hideError() {
+      document.getElementById('errorBanner').style.display = 'none';
+    }
+
+    // ─── Init ────────────────────────────────────────────────────────────────────
+    buildRows();
+    fetchPrices();
+    setInterval(fetchPrices, 60_000); // auto-refresh every 60 seconds
+  </script>
+
+</body>
+</html>
