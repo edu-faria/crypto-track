@@ -193,10 +193,11 @@
       flex-shrink: 0;
     }
 
-    .icon-eth  { background: linear-gradient(135deg, #627eea, #3c4fcf); }
-    .icon-wrp  { background: linear-gradient(135deg, #a855f7, #7e22ce); }
-    .icon-pep  { background: linear-gradient(135deg, #4ade80, #16a34a); }
-    .icon-btc  { background: linear-gradient(135deg, #f7971e, #f59e0b); }
+    .icon-eth   { background: linear-gradient(135deg, #627eea, #3c4fcf); }
+    .icon-wrp   { background: linear-gradient(135deg, #a855f7, #7e22ce); }
+    .icon-pep   { background: linear-gradient(135deg, #4ade80, #16a34a); }
+    .icon-btc   { background: linear-gradient(135deg, #f7971e, #f59e0b); }
+    .icon-trump { background: linear-gradient(135deg, #ef4444, #b91c1c); }
 
     .wallet-badge {
       display: inline-block;
@@ -205,6 +206,12 @@
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.5px;
+    }
+
+    .wallet-mnst {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
     .wallet-mmsk {
@@ -398,6 +405,17 @@
         quantity:    0.0075,
         coingeckoId: 'bitcoin',
         rowId:       'row-btc',
+      },
+      {
+        label:       'TRUMP',
+        iconClass:   'icon-trump',
+        iconEmoji:   '🇺🇸',
+        wallet:      'MNST',
+        walletClass: 'wallet-mnst',
+        walletEmoji: '🏛️',
+        quantity:    10.14,
+        coingeckoId: 'official-trump',
+        rowId:       'row-trump',
       },
     ];
 
