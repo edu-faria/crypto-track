@@ -198,6 +198,8 @@
     .icon-pep   { background: linear-gradient(135deg, #4ade80, #16a34a); }
     .icon-btc   { background: linear-gradient(135deg, #f7971e, #f59e0b); }
     .icon-trump { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+    .icon-xrp   { background: linear-gradient(135deg, #0ea5e9, #0369a1); }
+    .icon-shib  { background: linear-gradient(135deg, #fb923c, #c2410c); }
 
     .wallet-badge {
       display: inline-block;
@@ -206,6 +208,12 @@
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.5px;
+    }
+
+    .wallet-bson {
+      background: rgba(14, 165, 233, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(14, 165, 233, 0.3);
     }
 
     .wallet-mnst {
@@ -405,6 +413,39 @@
         quantity:    0.0075,
         coingeckoId: 'bitcoin',
         rowId:       'row-btc',
+      },
+      {
+        label:       'ETH',
+        iconClass:   'icon-eth',
+        iconEmoji:   '⟠',
+        wallet:      'BSON',
+        walletClass: 'wallet-bson',
+        walletEmoji: '🔷',
+        quantity:    0.05299198,
+        coingeckoId: 'ethereum',
+        rowId:       'row-eth-bson',
+      },
+      {
+        label:       'XRP',
+        iconClass:   'icon-xrp',
+        iconEmoji:   '✦',
+        wallet:      'BSON',
+        walletClass: 'wallet-bson',
+        walletEmoji: '🔷',
+        quantity:    68.456039,
+        coingeckoId: 'ripple',
+        rowId:       'row-xrp',
+      },
+      {
+        label:       'SHIB',
+        iconClass:   'icon-shib',
+        iconEmoji:   '🐕',
+        wallet:      'BSON',
+        walletClass: 'wallet-bson',
+        walletEmoji: '🔷',
+        quantity:    4022115,
+        coingeckoId: 'shiba-inu',
+        rowId:       'row-shib',
       },
       {
         label:       'TRUMP',
