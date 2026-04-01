@@ -112,7 +112,6 @@
 
     .refresh-icon {
       display: inline-block;
-      transition: transform 0.5s ease;
     }
 
     .refresh-icon.spinning {
@@ -123,9 +122,43 @@
       to { transform: rotate(360deg); }
     }
 
-    .table-wrapper {
+    /* ── Section ─────────────────────────────────────────── */
+    .section {
       width: 100%;
       max-width: 960px;
+      margin-bottom: 40px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding: 0 4px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+
+    .section-total-label {
+      font-size: 0.82rem;
+      color: #9a9ab5;
+    }
+
+    .section-total-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffd200;
+      margin-left: 8px;
+    }
+
+    /* ── Table ────────────────────────────────────────────── */
+    .table-wrapper {
+      width: 100%;
       background: rgba(255, 255, 255, 0.05);
       border-radius: 20px;
       overflow: hidden;
@@ -144,9 +177,9 @@
     }
 
     thead th {
-      padding: 18px 22px;
+      padding: 16px 22px;
       text-align: left;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1.2px;
@@ -168,7 +201,7 @@
     }
 
     tbody td {
-      padding: 16px 22px;
+      padding: 15px 22px;
       font-size: 0.95rem;
       color: #dde2f0;
     }
@@ -200,6 +233,8 @@
     .icon-trump { background: linear-gradient(135deg, #ef4444, #b91c1c); }
     .icon-xrp   { background: linear-gradient(135deg, #0ea5e9, #0369a1); }
     .icon-shib  { background: linear-gradient(135deg, #fb923c, #c2410c); }
+    .icon-sol   { background: linear-gradient(135deg, #9945ff, #14f195); }
+    .icon-doge  { background: linear-gradient(135deg, #c2a633, #f0d060); }
 
     .wallet-badge {
       display: inline-block;
@@ -208,6 +243,18 @@
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.5px;
+    }
+
+    .wallet-mmsk {
+      background: rgba(99, 179, 237, 0.15);
+      color: #63b3ed;
+      border: 1px solid rgba(99, 179, 237, 0.3);
+    }
+
+    .wallet-blw {
+      background: rgba(252, 129, 74, 0.15);
+      color: #fc814a;
+      border: 1px solid rgba(252, 129, 74, 0.3);
     }
 
     .wallet-bson {
@@ -222,16 +269,10 @@
       border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
-    .wallet-mmsk {
-      background: rgba(99, 179, 237, 0.15);
-      color: #63b3ed;
-      border: 1px solid rgba(99, 179, 237, 0.3);
-    }
-
-    .wallet-blw {
-      background: rgba(252, 129, 74, 0.15);
-      color: #fc814a;
-      border: 1px solid rgba(252, 129, 74, 0.3);
+    .wallet-tr {
+      background: rgba(20, 241, 149, 0.12);
+      color: #14f195;
+      border: 1px solid rgba(20, 241, 149, 0.3);
     }
 
     .quantity {
@@ -274,10 +315,10 @@
       100% { background-position: -200% 0; }
     }
 
-    .summary-bar {
+    /* ── Grand total bar ─────────────────────────────────── */
+    .grand-total-bar {
       width: 100%;
       max-width: 960px;
-      margin-top: 24px;
       background: rgba(255, 255, 255, 0.05);
       border-radius: 16px;
       padding: 20px 28px;
@@ -286,15 +327,16 @@
       align-items: center;
       border: 1px solid rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(10px);
+      margin-bottom: 40px;
     }
 
-    .summary-bar span {
+    .grand-total-bar span {
       font-size: 0.9rem;
       color: #9a9ab5;
     }
 
-    .summary-bar strong {
-      font-size: 1.25rem;
+    .grand-total-bar strong {
+      font-size: 1.3rem;
       color: #ffd200;
       margin-left: 10px;
     }
@@ -313,7 +355,6 @@
     }
 
     footer {
-      margin-top: 40px;
       font-size: 0.78rem;
       color: #55556a;
     }
@@ -338,161 +379,158 @@
 
   <div class="error-banner" id="errorBanner"></div>
 
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>💎 Crypto</th>
-          <th>👛 Wallet</th>
-          <th>🔢 Quantity</th>
-          <th>💵 Price / Unit</th>
-          <th>💰 Total Value</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <!-- Rows rendered by JS -->
-      </tbody>
-    </table>
-  </div>
+  <!-- Wallet sections are rendered here by JS -->
+  <div id="sectionsContainer"></div>
 
-  <div class="summary-bar">
-    <span>🧾 Total holdings across all wallets</span>
+  <div class="grand-total-bar">
+    <span>🌐 Grand Total across all wallets</span>
     <div>
       <span>Portfolio Value:</span>
-      <strong id="portfolioTotal"><span class="skeleton"></span></strong>
+      <strong id="grandTotal"><span class="skeleton"></span></strong>
     </div>
   </div>
 
   <footer>⚡ Crypto Portfolio Tracker &mdash; Prices from <a href="https://www.coingecko.com" target="_blank" rel="noopener" style="color:#ffd200;text-decoration:none;">CoinGecko</a></footer>
 
   <script>
-    // ─── Holdings config ────────────────────────────────────────────────────────
-    // coingeckoId: the CoinGecko coin id used for price lookups
-    // weth uses ethereum pricing since it's 1:1 pegged
-    const HOLDINGS = [
+    // ─── Wallet groups ───────────────────────────────────────────────────────────
+    const WALLET_GROUPS = [
       {
-        label:       'WRP ETH',
-        iconClass:   'icon-wrp',
-        iconEmoji:   '🌀',
-        wallet:      'MMSK',
-        walletClass: 'wallet-mmsk',
-        walletEmoji: '💼',
-        quantity:    0.00389,
-        coingeckoId: 'ethereum',
-        rowId:       'row-wrpeth',
+        id:     'multi',
+        title:  '💼 Multi-Wallet Holdings',
+        holdings: [
+          {
+            label: 'WRP ETH', iconClass: 'icon-wrp', iconEmoji: '🌀',
+            wallet: 'MMSK', walletClass: 'wallet-mmsk', walletEmoji: '💼',
+            quantity: 0.00389, coingeckoId: 'ethereum', rowId: 'row-wrpeth',
+          },
+          {
+            label: 'ETH', iconClass: 'icon-eth', iconEmoji: '⟠',
+            wallet: 'MMSK', walletClass: 'wallet-mmsk', walletEmoji: '💼',
+            quantity: 0.00164, coingeckoId: 'ethereum', rowId: 'row-eth-mmsk',
+          },
+          {
+            label: 'PEP', iconClass: 'icon-pep', iconEmoji: '🐸',
+            wallet: 'MMSK', walletClass: 'wallet-mmsk', walletEmoji: '💼',
+            quantity: 1000158.32, coingeckoId: 'pepe', rowId: 'row-pep',
+          },
+          {
+            label: 'BTC', iconClass: 'icon-btc', iconEmoji: '₿',
+            wallet: 'BLW', walletClass: 'wallet-blw', walletEmoji: '🔥',
+            quantity: 0.0075, coingeckoId: 'bitcoin', rowId: 'row-btc-blw',
+          },
+          {
+            label: 'ETH', iconClass: 'icon-eth', iconEmoji: '⟠',
+            wallet: 'BSON', walletClass: 'wallet-bson', walletEmoji: '🔷',
+            quantity: 0.05299198, coingeckoId: 'ethereum', rowId: 'row-eth-bson',
+          },
+          {
+            label: 'XRP', iconClass: 'icon-xrp', iconEmoji: '✦',
+            wallet: 'BSON', walletClass: 'wallet-bson', walletEmoji: '🔷',
+            quantity: 68.456039, coingeckoId: 'ripple', rowId: 'row-xrp-bson',
+          },
+          {
+            label: 'SHIB', iconClass: 'icon-shib', iconEmoji: '🐕',
+            wallet: 'BSON', walletClass: 'wallet-bson', walletEmoji: '🔷',
+            quantity: 4022115, coingeckoId: 'shiba-inu', rowId: 'row-shib',
+          },
+          {
+            label: 'TRUMP', iconClass: 'icon-trump', iconEmoji: '🇺🇸',
+            wallet: 'MNST', walletClass: 'wallet-mnst', walletEmoji: '🏛️',
+            quantity: 10.14, coingeckoId: 'official-trump', rowId: 'row-trump',
+          },
+        ],
       },
       {
-        label:       'ETH',
-        iconClass:   'icon-eth',
-        iconEmoji:   '⟠',
-        wallet:      'MMSK',
-        walletClass: 'wallet-mmsk',
-        walletEmoji: '💼',
-        quantity:    0.00164,
-        coingeckoId: 'ethereum',
-        rowId:       'row-eth',
-      },
-      {
-        label:       'PEP',
-        iconClass:   'icon-pep',
-        iconEmoji:   '🐸',
-        wallet:      'MMSK',
-        walletClass: 'wallet-mmsk',
-        walletEmoji: '💼',
-        quantity:    1000158.32,
-        coingeckoId: 'pepe',
-        rowId:       'row-pep',
-      },
-      {
-        label:       'BTC',
-        iconClass:   'icon-btc',
-        iconEmoji:   '₿',
-        wallet:      'BLW',
-        walletClass: 'wallet-blw',
-        walletEmoji: '🔥',
-        quantity:    0.0075,
-        coingeckoId: 'bitcoin',
-        rowId:       'row-btc',
-      },
-      {
-        label:       'ETH',
-        iconClass:   'icon-eth',
-        iconEmoji:   '⟠',
-        wallet:      'BSON',
-        walletClass: 'wallet-bson',
-        walletEmoji: '🔷',
-        quantity:    0.05299198,
-        coingeckoId: 'ethereum',
-        rowId:       'row-eth-bson',
-      },
-      {
-        label:       'XRP',
-        iconClass:   'icon-xrp',
-        iconEmoji:   '✦',
-        wallet:      'BSON',
-        walletClass: 'wallet-bson',
-        walletEmoji: '🔷',
-        quantity:    68.456039,
-        coingeckoId: 'ripple',
-        rowId:       'row-xrp',
-      },
-      {
-        label:       'SHIB',
-        iconClass:   'icon-shib',
-        iconEmoji:   '🐕',
-        wallet:      'BSON',
-        walletClass: 'wallet-bson',
-        walletEmoji: '🔷',
-        quantity:    4022115,
-        coingeckoId: 'shiba-inu',
-        rowId:       'row-shib',
-      },
-      {
-        label:       'TRUMP',
-        iconClass:   'icon-trump',
-        iconEmoji:   '🇺🇸',
-        wallet:      'MNST',
-        walletClass: 'wallet-mnst',
-        walletEmoji: '🏛️',
-        quantity:    10.14,
-        coingeckoId: 'official-trump',
-        rowId:       'row-trump',
+        id:     'tr',
+        title:  '🏦 TR Wallet',
+        holdings: [
+          {
+            label: 'BTC', iconClass: 'icon-btc', iconEmoji: '₿',
+            wallet: 'TR', walletClass: 'wallet-tr', walletEmoji: '🏦',
+            quantity: 0.029828, coingeckoId: 'bitcoin', rowId: 'row-btc-tr',
+          },
+          {
+            label: 'SOL', iconClass: 'icon-sol', iconEmoji: '◎',
+            wallet: 'TR', walletClass: 'wallet-tr', walletEmoji: '🏦',
+            quantity: 2.060834, coingeckoId: 'solana', rowId: 'row-sol-tr',
+          },
+          {
+            label: 'ETH', iconClass: 'icon-eth', iconEmoji: '⟠',
+            wallet: 'TR', walletClass: 'wallet-tr', walletEmoji: '🏦',
+            quantity: 0.045193, coingeckoId: 'ethereum', rowId: 'row-eth-tr',
+          },
+          {
+            label: 'DOGE', iconClass: 'icon-doge', iconEmoji: '🐶',
+            wallet: 'TR', walletClass: 'wallet-tr', walletEmoji: '🏦',
+            quantity: 345.901046, coingeckoId: 'dogecoin', rowId: 'row-doge-tr',
+          },
+          {
+            label: 'XRP', iconClass: 'icon-xrp', iconEmoji: '✦',
+            wallet: 'TR', walletClass: 'wallet-tr', walletEmoji: '🏦',
+            quantity: 8.084883, coingeckoId: 'ripple', rowId: 'row-xrp-tr',
+          },
+        ],
       },
     ];
 
-    // Tracks previous prices to show up/down flash
     const prevPrices = {};
 
-    // ─── Build skeleton rows on first load ──────────────────────────────────────
-    function buildRows() {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = HOLDINGS.map(h => `
-        <tr id="${h.rowId}">
-          <td>
-            <div class="crypto-name">
-              <div class="crypto-icon ${h.iconClass}">${h.iconEmoji}</div>
-              ${h.label}
+    // ─── Build all sections & tables ────────────────────────────────────────────
+    function buildSections() {
+      const container = document.getElementById('sectionsContainer');
+      container.innerHTML = WALLET_GROUPS.map(group => `
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">${group.title}</span>
+            <div>
+              <span class="section-total-label">Total:</span>
+              <span class="section-total-value" id="total-${group.id}"><span class="skeleton"></span></span>
             </div>
-          </td>
-          <td><span class="wallet-badge ${h.walletClass}">${h.walletEmoji} ${h.wallet}</span></td>
-          <td class="quantity">${formatQty(h.quantity)}</td>
-          <td class="price" id="${h.rowId}-price"><span class="skeleton"></span></td>
-          <td class="total" id="${h.rowId}-total"><span class="skeleton"></span></td>
-        </tr>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>💎 Crypto</th>
+                  <th>👛 Wallet</th>
+                  <th>🔢 Quantity</th>
+                  <th>💵 Price / Unit</th>
+                  <th>💰 Total Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${group.holdings.map(h => `
+                  <tr id="${h.rowId}">
+                    <td>
+                      <div class="crypto-name">
+                        <div class="crypto-icon ${h.iconClass}">${h.iconEmoji}</div>
+                        ${h.label}
+                      </div>
+                    </td>
+                    <td><span class="wallet-badge ${h.walletClass}">${h.walletEmoji} ${h.wallet}</span></td>
+                    <td class="quantity">${formatQty(h.quantity)}</td>
+                    <td class="price" id="${h.rowId}-price"><span class="skeleton"></span></td>
+                    <td class="total" id="${h.rowId}-total"><span class="skeleton"></span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
       `).join('');
     }
 
     // ─── Number helpers ──────────────────────────────────────────────────────────
     function formatQty(n) {
-      // Show enough decimals for both tiny and large quantities
       if (n >= 1000) return n.toLocaleString('de-DE', { maximumFractionDigits: 2 });
       return n.toLocaleString('de-DE', { maximumSignificantDigits: 6 });
     }
 
     function formatPrice(n) {
-      if (n < 0.0001)  return n.toLocaleString('de-DE', { maximumSignificantDigits: 4 });
-      if (n < 1)       return n.toLocaleString('de-DE', { minimumFractionDigits: 6, maximumFractionDigits: 8 });
-      if (n < 10)      return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+      if (n < 0.0001) return n.toLocaleString('de-DE', { maximumSignificantDigits: 4 });
+      if (n < 1)      return n.toLocaleString('de-DE', { minimumFractionDigits: 6, maximumFractionDigits: 8 });
+      if (n < 10)     return n.toLocaleString('de-DE', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
       return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
@@ -500,19 +538,20 @@
       return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // ─── Flash animation helper ──────────────────────────────────────────────────
+    // ─── Flash animation ─────────────────────────────────────────────────────────
     function flash(el, direction) {
       el.classList.remove('flash-up', 'flash-down');
-      void el.offsetWidth; // reflow to restart animation
+      void el.offsetWidth;
       el.classList.add(direction === 'up' ? 'flash-up' : 'flash-down');
       setTimeout(() => el.classList.remove('flash-up', 'flash-down'), 1500);
     }
 
-    // ─── Main fetch ──────────────────────────────────────────────────────────────
+    // ─── Fetch ───────────────────────────────────────────────────────────────────
     async function fetchPrices() {
       setLoading(true);
 
-      const ids = [...new Set(HOLDINGS.map(h => h.coingeckoId))].join(',');
+      const allHoldings = WALLET_GROUPS.flatMap(g => g.holdings);
+      const ids = [...new Set(allHoldings.map(h => h.coingeckoId))].join(',');
       const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur`;
 
       try {
@@ -520,7 +559,7 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
-        updateTable(data);
+        updateTables(data);
         setStatus('ok');
         hideError();
       } catch (err) {
@@ -531,35 +570,42 @@
       }
     }
 
-    function updateTable(data) {
-      let portfolioTotal = 0;
+    function updateTables(data) {
+      let grandTotal = 0;
 
-      HOLDINGS.forEach(h => {
-        const coinData = data[h.coingeckoId];
-        if (!coinData) return;
+      WALLET_GROUPS.forEach(group => {
+        let groupTotal = 0;
 
-        const price = coinData.eur;
-        const total = price * h.quantity;
-        portfolioTotal += total;
+        group.holdings.forEach(h => {
+          const coinData = data[h.coingeckoId];
+          if (!coinData) return;
 
-        const priceEl = document.getElementById(`${h.rowId}-price`);
-        const totalEl = document.getElementById(`${h.rowId}-total`);
+          const price = coinData.eur;
+          const total = price * h.quantity;
+          groupTotal += total;
+          grandTotal += total;
 
-        const prev = prevPrices[h.rowId];
-        if (prev !== undefined && price !== prev) {
-          flash(priceEl, price > prev ? 'up' : 'down');
-          flash(totalEl, price > prev ? 'up' : 'down');
-        }
-        prevPrices[h.rowId] = price;
+          const priceEl = document.getElementById(`${h.rowId}-price`);
+          const totalEl = document.getElementById(`${h.rowId}-total`);
 
-        priceEl.textContent = `${formatPrice(price)} €`;
-        totalEl.textContent = `${formatTotal(total)} €`;
+          const prev = prevPrices[h.rowId];
+          if (prev !== undefined && price !== prev) {
+            flash(priceEl, price > prev ? 'up' : 'down');
+            flash(totalEl, price > prev ? 'up' : 'down');
+          }
+          prevPrices[h.rowId] = price;
+
+          priceEl.textContent = `${formatPrice(price)} €`;
+          totalEl.textContent = `${formatTotal(total)} €`;
+        });
+
+        document.getElementById(`total-${group.id}`).textContent = `${formatTotal(groupTotal)} €`;
       });
 
-      document.getElementById('portfolioTotal').textContent = `${formatTotal(portfolioTotal)} €`;
+      document.getElementById('grandTotal').textContent = `${formatTotal(grandTotal)} €`;
     }
 
-    // ─── UI state helpers ────────────────────────────────────────────────────────
+    // ─── UI helpers ──────────────────────────────────────────────────────────────
     function setLoading(isLoading) {
       const btn  = document.getElementById('refreshBtn');
       const icon = document.getElementById('refreshIcon');
@@ -595,9 +641,9 @@
     }
 
     // ─── Init ────────────────────────────────────────────────────────────────────
-    buildRows();
+    buildSections();
     fetchPrices();
-    setInterval(fetchPrices, 60_000); // auto-refresh every 60 seconds
+    setInterval(fetchPrices, 60_000);
   </script>
 
 </body>
